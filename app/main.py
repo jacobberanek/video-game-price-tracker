@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from app.models import Product
 from app.db import engine, Base, SessionLocal, get_db
-from .routes import products, prices
+from .routes import products, prices, vendors
 from .services.steam_fetcher import SteamPriceFetcher
 import logging
 
@@ -21,9 +21,7 @@ def health_check():
 
 app.include_router(products.router)
 app.include_router(prices.router)
+app.include_router(vendors.router)
 
-fetcher = SteamPriceFetcher()
-price = fetcher.price_fetch("1145360")
-print(f"{fetcher.get_vendor_name()}: ${price}")
 
 

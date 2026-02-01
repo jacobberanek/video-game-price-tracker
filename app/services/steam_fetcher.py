@@ -5,7 +5,7 @@ from app.services.base_fetcher import BasePriceFetcher
 #API URL Structure: https://store.steampowered.com/api/appdetails?appids={GAME_ID}&cc=us&filters=price_overview
 
 #SUCCESSFUL REQUEST
-#   GAME_ID = steam id
+#   GAME_ID = steam id (i.e. https://store.steampowered.com/app/>>>>>>>>1086940<<<<<</Baldurs_Gate_3/)
 #   PRICE = final price after discount in the form 2499 ($24.99)
 #{"{GAME_ID}": {"success":true, "data":{"price_overview":{"final":"{PRICE}"}}}}
 
