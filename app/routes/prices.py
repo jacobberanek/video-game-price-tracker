@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from ..db import get_db, SessionLocal, engine, Base
 from .. import schemas, models
 from ..services.steam_fetcher import SteamPriceFetcher
+from typing import Optional
+from datetime import date
 
 router = APIRouter(prefix="/prices", tags=["prices"])
 
@@ -42,5 +44,18 @@ def update_product_price(product_id: int, vendor_name: str="Steam", db: Session 
     return price_record
 
 @router.get("/{product_id}", response_model = list[schemas.PriceHistoryResponse])
-def get_prices(product_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Price_History).filter(models.Price_History.product_id).all()
+def get_prices(
+    product_id: int,
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: Session = Depends(get_db)
+):
+    
+    query = db.query(models.Price_History).filter(models.Price_History.product_id == product_id)
+    
+    if start_date:
+        query = query.filter(models.Price_History.created_at >= start_date)
+    if end_date:
+        query = query.filter(models.Price_History.created_at <= end_date)
+
+    return query.all()
