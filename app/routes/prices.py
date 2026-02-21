@@ -43,6 +43,32 @@ def update_product_price(product_id: int, vendor_name: str="Steam", db: Session 
 
     return price_record
 
+@router.post("/update-all")
+def update_all_prices(db: Session = Depends(get_db)):
+    products = db.query(models.Product).all()
+
+    results = []
+    success = 0
+    fail = 0
+    steam_fetcher = SteamPriceFetcher()
+    for product in products:
+        price = steam_fetcher.price_fetch(product.external_id)
+
+        if price is None:
+            fail += 1
+            results.append({"product_id": product.id, "success": False, "error": "Price not found"})
+        else:
+            success += 1
+            results.append({"product_id": product.id, "success": True, "price": price})
+    return {
+        "total": len(products),
+        "succeeded": success,
+        "failed": fail,
+        "results": results
+    }
+
+
+
 @router.get("/{product_id}", response_model = list[schemas.PriceHistoryResponse])
 def get_prices(
     product_id: int,
